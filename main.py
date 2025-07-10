@@ -5,45 +5,48 @@ import pyttsx3
 import webbrowser
 import os
 import datetime
-
-def ask_ollama(prompt):
-    try:
-        print("🧠 Asking Ollama AI...")
-
-        response = ollama.chat(
-            model='llama3',
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful assistant that gives clear and factual answers in one paragraph."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        )
-
-        answer = response.get("message", {}).get("content", "Sorry, no response.")
-        print("💬 Ollama says:", answer)
-        say(answer)
-
-        if not os.path.exists("Ollama"):
-            os.makedirs("Ollama")
-
-        file_path = f"Ollama/prompt_{random.randint(1, 999999)}.txt"
-        with open(file_path, "w", encoding="utf-8") as file:
-            file.write(f"Prompt: {prompt}\n\nResponse:\n{answer}")
-
-    except Exception as e:
-        print("❌ Error:", e)
-        say("Sorry, there was an error while talking to the AI.")
+import pyautogui
+import pyperclip
+import screen_brightness_control as sbc
+import ctypes
+import psutil
 
 
 def say(text):
     engine = pyttsx3.init()
     engine.say(text)
     engine.runAndWait()
+
+
+def set_brightness(level):
+    try:
+        command = f"(Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1,{level})"
+        os.system(f'powershell -Command "{command}"')
+        say(f"Brightness set to {level} percent")
+    except Exception as e:
+        say("Failed to set brightness.")
+        print("Error:", e)
+
+
+def increase_brightness():
+    try:
+        current = sbc.get_brightness(display=0)[0]  # current brightness
+        new_brightness = min(100, current + 20)     # max 100
+        sbc.set_brightness(new_brightness)
+        say(f"Brightness increased to {new_brightness} percent")
+    except Exception as e:
+        say("Failed to change brightness")
+        print(e)
+
+def decrease_brightness():
+    try:
+        current = sbc.get_brightness(display=0)[0]
+        new_brightness = max(0, current - 20)
+        sbc.set_brightness(new_brightness)
+        say(f"Brightness decreased to {new_brightness} percent")
+    except Exception as e:
+        say("Failed to change brightness")
+        print(e)
 
 
 def take_Command():
@@ -60,7 +63,6 @@ def take_Command():
         except Exception:
             print("Sorry, I did not understand that. Please try again.")
             return ""
-
 
 if __name__ == '__main__':
     print("Starting speech recognition...")
@@ -102,53 +104,112 @@ if __name__ == '__main__':
 
         # Time
         if "time" in query.lower():
-            hour = datetime.datetime.now().strftime("%H")
-            minute = datetime.datetime.now().strftime("%M")
-            say(f"Sir Time is {hour} : {minute} Minutes Now ")
-            matched = True
+             hour = datetime.datetime.now().strftime("%H")
+             minute = datetime.datetime.now().strftime("%M")
+             say(f"Sir Time is {hour} : {minute} Minutes Now ")
+             matched = True
 
         # Windows Apps
-        if "open notepad" in query.lower():
+        elif "open notepad" in query.lower():
             say("Opening Notepad")
             os.system("start notepad")
             matched = True
 
-        if "open camera" in query.lower():
+        elif "open camera" in query.lower():
             say("Opening Camera")
             os.system("start microsoft.windows.camera:")
             matched = True
 
-        if "open calculator" in query.lower():
+        elif "open calculator" in query.lower():
             say("Opening Calculator")
             os.system("start calc")
             matched = True
 
-        if "open paint" in query.lower():
+        elif "open paint" in query.lower():
             say("Opening Paint")
             os.system("start mspaint")
             matched = True
 
-        if "open command prompt" in query.lower() or "open cmd" in query.lower():
+        elif "open command prompt" in query.lower() or "open cmd" in query.lower():
             say("Opening Command Prompt")
             os.system("start cmd")
             matched = True
 
-        if "open chrome" in query.lower():
+        elif "open chrome" in query.lower():
             say("Opening Google Chrome")
             os.system("start chrome")
             matched = True
 
-        if "open code" in query.lower():
+        elif "open code" in query.lower():
             say(f"Opening Visual Studio Code")
             os.system("start code")
             matched = True
 
-        # AI via Ollama
-        if "ai" in query.lower():
-            ask_ollama(prompt=query)
+        elif "increase volume" in query.lower():
+            pyautogui.press("volumeup")
+            say("Volume increased")
             matched = True
 
+        elif "decrease volume" in query.lower():
+            pyautogui.press("volumedown")
+            say("Volume decreased")
+            matched = True
+
+        elif "mute volume" in query.lower():
+            pyautogui.press("volumemute")
+            say("Volume muted")
+            matched = True
+
+        elif "unmute volume" in query.lower():
+            pyautogui.press("volumemute")
+            say("Volume unmuted")
+            matched = True
+
+        elif "take screenshot" in query.lower():
+            os.system("start ms-screenclip:")
+            say("Snipping Tool opened. Please capture manually.")
+            matched = True
+
+        elif "increase brightness" in query.lower():
+            increase_brightness()  # set brightness to 80%
+            matched = True
+
+        elif "decrease brightness" in query.lower():
+            decrease_brightness() # set brightness to 30%
+            matched = True
+
+        elif "lock screen" in query.lower():
+            ctypes.windll.user32.LockWorkStation()
+            matched = True
+
+        elif "battery" in query.lower():
+            battery = psutil.sensors_battery()
+            percent = battery.percent
+            say(f"Battery is at {percent} percent")
+            matched = True
+
+        elif "ram" in query.lower():
+            ram = psutil.virtual_memory()
+            say(f"RAM usage is at {ram.percent} percent")
+            matched = True
+
+        elif "cpu" in query.lower():
+            cpu = psutil.cpu_percent(interval=1)
+            say(f"CPU usage is at {cpu} percent")
+            matched = True
+
+        elif "clipboard" in query.lower():
+            content = pyperclip.paste()
+            say("Clipboard contains " + content)
+            matched = True
+
+        elif "close youtube" in query.lower() or "close video" in query.lower():
+            say("Closing YouTube tab or browser")
+            os.system("taskkill /F /IM chrome.exe")
+            matched = True
+
+
         # Stop
-        if "stop" in query.lower():
+        elif "stop" in query.lower():
             say("Goodbye Sir, have a nice day")
             break
