@@ -1,0 +1,13 @@
+Ollama Response for prompt: AI 
+*******************
+ Hello! You've connected to the helpful assistant. How can I assist you today? Here are a few things I can help with:
+
+1. Answering questions about a wide range of topics, such as general knowledge, science, history, mathematics, and more.
+2. Helping you learn or brush up on specific skills, like coding, language learning, or problem-solving strategies.
+3. Offering tips for personal development, productivity, health, and wellness.
+4. Generating creative ideas, writing inspiration, or brainstorming for projects.
+5. Explaining complex concepts in an easy-to-understand manner, making learning enjoyable and engaging.
+6. Assisting with finding information online or providing guidance on using digital tools and platforms.
+7. Keeping you entertained with jokes, trivia, fun facts, and more!
+
+Let me know what you need help with, and I'll do my best to assist you.
