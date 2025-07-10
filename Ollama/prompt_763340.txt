@@ -1,0 +1,4 @@
+Prompt: AI
+
+Response:
+Artificial Intelligence (AI) refers to the development of computer systems that can perform tasks that would typically require human intelligence, such as visual perception, speech recognition, decision-making, and language translation. AI involves a combination of machine learning, natural language processing, and robotics, allowing machines to learn from data, adapt to new situations, and make decisions independently. The field of AI has seen significant advancements in recent years, with applications in areas such as virtual assistants, self-driving cars, medical diagnosis, customer service, and cybersecurity.
